@@ -14,12 +14,9 @@ This module builds, installs and configures the [Aside Utility for Kerberos Supp
 1. [Development - Guide for contributing to the module](#development)
 
 ## Description
+The AUKS daemon solves the problem of users having to access to their Kerberos tickets on Slurm compute nodes, because their sessions on these nodes are created using Munge without a user password. This results in problems like the inability to access file shares that need authentication with Kerberos, e.g. NFS4+KRB5.
 
-Briefly tell users why they might want to use your module. Explain what your
-module does and what kind of problems users can solve with it.
-
-This should be a fairly short description helps the user decide if your module
-is what they want.
+AUKS needs to be built from [sources](https://github.com/cea-hpc/auks) and installed from the RPMs. Other methods do not create the unit files for starting the services. Therefore, this module automates the whole build process by (i) obtaining the sources from GitHub, (ii) running the whole build pipeline, (iii) creating the RPMs from the binaries, (iv) installing said RPMs and (v) providing the configuration files. In step (iii), there is the option to remove the dependency on the Slurm RPMs for cases in which Slurm is built from source an known to be available on all nodes.
 
 ## Setup
 
