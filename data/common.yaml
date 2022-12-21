@@ -1,1 +1,59 @@
---- {}
+---
+auks::dependencies:
+  - gcc
+  - make
+  - automake
+  - autoconf
+  - libtool
+  - rpm-build
+  - libtirpc-devel
+  - byacc
+  - git
+  - sed
+auks::repository_url: 'https://github.com/cea-hpc/auks/'
+auks::repository_revision: f584015a508247ad90d7aa319a50c1aa87e4cf3c
+
+auks::primary_server:
+    name: 'auks'
+    port: 12345
+    principal: 'host/auks@REALM'
+
+auks::common:
+  NAT: 'no'
+  Retries: 3
+  Timeout: 10
+  Delay: 3
+
+auks::api:
+  LogFile: '/var/log/auksapi.log'
+  LogLevel: 0
+  DebugFile: '/var/log/auksapi.log'
+  DebugLevel: 0
+
+auks::auksd:
+  PrimaryKeytab: '/etc/krb5.keytab'
+  SecondayKeytab: '/etc/krb5.keytab'
+  LogFile: '/var/log/auksd.log'
+  LogLevel: 1
+  DebugFile: '/var/log/auksd.log'
+  DebugLevel: 0
+  CacheDir: '/var/cache/auks'
+  ACLFile: '/etc/auks/auks.acl'
+  QueueSize: 50
+  RepoSize: 500
+  Workers: 10
+  CleanDelay: 300
+  ReplayCache: 'yes'
+
+auks::renewer:
+  LogFile: '/var/log/auksd.log'
+  LogLevel: 1
+  DebugFile: '/var/log/auksd.log'
+  DebugLevel: 0
+  Delay: 60
+  MinLifeTime: 600
+
+auks::rules:
+  - principal: '^[[:alnum:]]*@REALM$'
+    host: '*'
+    role: 'user'

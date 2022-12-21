@@ -1,0 +1,19 @@
+<%- | Array[Hash] $builtin_rules, Array[Hash] $rules | -%>
+# -----------------------------------------------------------------------------#
+# Managed and automatically deployed by Puppet. Changes will be overwritten.   #
+# -----------------------------------------------------------------------------#
+
+<% $builtin_rules.each |$rule| { -%>
+rule {
+<% $rule.each |$key, $value| { -%>
+    <%= $key %> = <%= $value %>;
+<% } -%>
+}
+<% } -%>
+<% $rules.each |$rule| { -%>
+rule {
+<% $rule.each |$key, $value| { -%>
+    <%= $key %> = <%= $value %>;
+<% } -%>
+}
+<% } -%>

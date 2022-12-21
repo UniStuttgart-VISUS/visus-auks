@@ -1,0 +1,38 @@
+<%- | Hash $primary_server, Optional[Hash] $secondary_server, Hash $common, Hash $api, Hash $auksd, Hash $renewer | -%>
+# -----------------------------------------------------------------------------#
+# Managed and automatically deployed by Puppet. Changes will be overwritten.   #
+# -----------------------------------------------------------------------------#
+
+common {
+    PrimaryHost = "<%= $primary_server['name'] %>";
+    PrimaryPort = "<%= $primary_server['port'] %>";
+    PrimaryPrincipal = "<%= $primary_server['principal'] %>";
+<%- if $secondary_host { -%>
+
+    SecondaryHost = "<%= $secondary_server['name'] %>";
+    SecondaryPort = "<%= $secondary_server['port'] %>";
+    SecondaryPrincipal = "<%= $secondary_server['principal'] %>";
+<%- } -%>
+
+<% $common.each |$key, $value| { -%>
+    <%= $key %> = "<%= $value %>";
+<% } -%>
+}
+
+api {
+<% $api.each |$key, $value| { -%>
+    <%= $key %> = "<%= $value %>";
+<% } -%>
+}
+
+auksd {
+<% $auksd.each |$key, $value| { -%>
+    <%= $key %> = "<%= $value %>";
+<% } -%>
+}
+
+renewer {
+<% $renewer.each |$key, $value| { -%>
+    <%= $key %> = "<%= $value %>";
+<% } -%>
+}
