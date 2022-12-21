@@ -1,6 +1,6 @@
 # auks
 
-This module builds, installs and configures the (Aside Utility for Kerberos Support (AUKS))[https://github.com/cea-hpc/auks], which can be used to forward Kerberos authentications from the scheduler node of a Slurm cluster to the compute nodes. This way, it is possible to access Kerberos-protected resources like NFS4+KRB5 file shares.
+This module builds, installs and configures the [Aside Utility for Kerberos Support (AUKS)](https://github.com/cea-hpc/auks), which can be used to forward Kerberos authentications from the scheduler node of a Slurm cluster to the compute nodes. This way, it is possible to access Kerberos-protected resources like NFS4+KRB5 file shares.
 
 ## Table of Contents
 
