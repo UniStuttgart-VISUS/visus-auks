@@ -24,7 +24,7 @@ which receive the data. Please note that the module does not configure the follo
 * The firewall on the nodes. You must use a separate module for modifying firewall settings. A port rule for the
 port configured as `auks::primary_server::port` and `auks::secondary_server::port` is required.
 * The registration of the Slurm SPANKS plugin. Use the module you use for installing Slurm to do this. If you are
-using `treydock-slurm`, this can by accomplished by:
+using `treydock-slurm`, this can by accomplished by (cf. https://github.com/hautreux/auks/blob/master/HOWTO):
 
 ```puppet
     slurm::spank { 'auks':
