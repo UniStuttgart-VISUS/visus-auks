@@ -35,11 +35,9 @@ This module requires Slurm to be installed on machines it affects. The module it
 
 As the only reason to install AUKS is distributing Kerberos tickets to compute nodes, you need to have a KDC like Active Directory set up correctly. The login node and the compute node must be members of the Kerberos realm.
 
-As AUKS needs to be built from source, development tools need to be present, too. The module will install these by itself.
-
 ### Beginning with auks
 
-When using Hiera
+When using Hiera, installing AUKS is fairly trivial in that just the class needs to be included. Please note, however, that manual work is required for configuring the firewall and the Slurm SPANKS plugin.
 
 ## Usage
 The auks resource can be fully configured via Hiera. Assuming a Slurm installation
@@ -60,7 +58,33 @@ slurm::spank { 'auks':
 }
 ```
 
-The default confi
+The default configuration provided via Hiera mostly follows the defaults from the sample configuration files of AUKS. However, you must configure at least the `primary_server` and the rules for the principals (admin rules for the `primary_server` and the optional `secondary_server` will be generated automatically, so you only need to cover the compute nodes and the users). An example configuration might look like:
+
+```yaml
+auks::primary_server:
+  name: 'thrashcore.some-university.de'
+  port: 14863
+  principal: 'THRASHCORE$@SOME-UNIVERSITY.DE'
+
+auks::rules:
+  - principal: '^CADINTULNIC\$@SOME\-UNIVERSITY\.DE$'
+    host: '*'
+    role: 'admin'
+  - principal: '^DEDRAGOSTE\$@SOME\-UNIVERSITY\.DE$'
+    host: '*'
+    role: 'admin'
+  - principal: '^LEGENYES\$@SOME\-UNIVERSITY\.DE$'
+    host: '*'
+    role: 'admin'
+  - principal: '^ZNAMENNYCHANT\$@SOME\-UNIVERSITY\.DE$'
+    host: '*'
+    role: 'admin'
+  - principal: '^[[:alnum:]]+@SOME\-UNIVERSITY\.DE$'
+    host: '*'
+    role: 'user'
+```
+
+Please note that the implicit rules generated for `primary_server` and the optional `secondary_server` are automatically escaped for use in regular expressions. The explicitly specified rules, however, are copied verbatim into the configuration file, so you must escape and special characters in regular expressions that you want to match.
 
 ## Limitations
 
