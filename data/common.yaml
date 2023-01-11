@@ -34,7 +34,7 @@ auks::auksd:
   PrimaryKeytab: '/etc/krb5.keytab'
   SecondayKeytab: '/etc/krb5.keytab'
   LogFile: '/var/log/auksd.log'
-  LogLevel: 1
+  LogLevel: 4
   DebugFile: '/var/log/auksd.log'
   DebugLevel: 0
   CacheDir: '/var/cache/auks'

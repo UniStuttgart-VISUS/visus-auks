@@ -18,6 +18,22 @@ The AUKS daemon solves the problem of users having to access to their Kerberos t
 
 AUKS needs to be built from [sources](https://github.com/cea-hpc/auks) and installed from the RPMs. Other methods do not create the unit files for starting the services. Therefore, this module automates the whole build process by (i) obtaining the sources from GitHub, (ii) running the whole build pipeline, (iii) creating the RPMs from the binaries, (iv) installing said RPMs and (v) providing the configuration files. In step (iii), there is the option to remove the dependency on the Slurm RPMs for cases in which Slurm is built from source an known to be available on all nodes.
 
+The module configures the AUKS login node from which the credentials are distribute as well as the compute nodes
+which receive the data. Please note that the module does not configure the following aspects:
+
+* The firewall on the nodes. You must use a separate module for modifying firewall settings. A port rule for the
+port configured as `auks::primary_server::port` and `auks::secondary_server::port` is required.
+* The registration of the Slurm SPANKS plugin. Use the module you use for installing Slurm to do this. If you are
+using `treydock-slurm`, this can by accomplished by:
+
+```puppet
+    slurm::spank { 'auks':
+        ensure => present,
+        arguments => [ 'default=enabled', 'spankstackcred=yes', 'minimum_uid=1024' ],
+        manage_package => false
+    }
+```
+
 ## Setup
 
 ### What auks affects **OPTIONAL**
@@ -108,3 +124,5 @@ necessary or important to include here. Please use the `##` header.
 [1]: https://puppet.com/docs/pdk/latest/pdk_generating_modules.html
 [2]: https://puppet.com/docs/puppet/latest/puppet_strings.html
 [3]: https://puppet.com/docs/puppet/latest/puppet_strings_style.html
+
+

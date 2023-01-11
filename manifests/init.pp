@@ -29,6 +29,41 @@ class auks(
         String $config_file = '/etc/auks/auks.conf'
         ) {
 
+    # Extract the host name from the principal name and the configured host name
+    # and use them to determine whether the node we are running on is an AUKS
+    # server node.
+    $primary_server_host = regsubst($primary_server['principal'], '(.+/)?([^@\$]+)$?@.*', '\\2', 'G')
+    $secondary_server_host = if ($secondary_server) {
+        regsubst($secondary_server['principal'], '(.+/)?([^@\$]+)$?@.*', '\\2', 'G')
+    } else {
+        ''
+    }
+    notify { "Auks hosts from principal name are \"${primary_server_host}\" and \"${secondary_server_host}\".":}
+    $primary_server_name = $primary_server['name']
+    $secondary_server_name = if ($secondary_server) {
+        $secondary_server['name']
+    } else {
+        ''
+    }
+    #notify { "Auks host names are \"${primary_server_name}\" and \"${secondary_server_name}\".":}
+
+    $is_server = ($primary_server_name == $trusted['hostname'])
+        or ($secondary_server_name == $trusted['hostname'])
+        or ($primary_server_name == $trusted['certname'])
+        or ($secondary_server_name == $trusted['certname'])
+        or ($primary_server_host == $trusted['hostname'])
+        or ($secondary_server_host == $trusted['hostname'])
+        or ($primary_server_host == $trusted['certname'])
+        or ($secondary_server_host == $trusted['certname'])
+
+    # In case we do not have Slurm from a repo, make sure that RPM does not
+    # perform the dependency check when installing.
+    $slurm_opts = if $patch_slurm_dependency {
+        [ '--nodeps' ]
+    } else {
+        []
+    }
+
     # Install dependencies we need to build AUKS.
     ensure_packages($dependencies)
 
@@ -54,6 +89,19 @@ class auks(
         patch_slurm_dependency => $patch_slurm_dependency
     }
 
+    # Install the RPMs (I can't believe that actually worked ...).
+    ~> package { 'auks':
+        ensure => present,
+        provider => rpm,
+        source => "${src_dir}/auks-[0-9].[0-9].[0-9]*86_64.rpm"
+    }
+    ~> package { 'auks-slurm':
+        ensure => present,
+        provider => rpm,
+        source => "${src_dir}/auks-slurm*.rpm",
+        install_options => $slurm_opts
+    }
+
     # Apply the configuration.
     file { $config_file:
         ensure => file,
@@ -70,15 +118,18 @@ class auks(
         })
     }
 
-    # Configure the access rules.
+    # Configure the built-in access rules, which make the AUKS servers
+    # automatically admin. The client nodes must be specified by the user
+    # in the configuration file.
     $primary_rule = {
-        principal => "^${regsubst($primary_server['principal'], '\.', '\.', 'G')}$",
+        # Hack from https://tickets.puppetlabs.com/browse/PUP-9554
+        principal => "^${String(Regexp($primary_server['principal'], true))}$",
         host => '*',
         role => 'admin'
     }
     $builtin_rules = if $secondary_server {
         $secondary_rule = {
-            principal => regsubst($secondary_server['principal'], '\.', '\.', 'G'),
+            principal => "^${String(Regexp($secondary_server['principal'], true))}$",
             host => '*',
             role => 'admin'
         }
@@ -96,5 +147,27 @@ class auks(
             builtin_rules => $builtin_rules,
             rules => $rules
         })
+    }
+
+    # Enable and start the services.
+    $server_state = if ($is_server) {
+        'running'
+    } else {
+        'stopped'
+    }
+
+    service { 'auksd':
+        ensure => $server_state,
+        enable => $is_server
+    }
+
+    ~> service { 'auksdrenewer':
+        ensure => $server_state,
+        enable => $is_server
+    }
+
+    ~> service { 'aukspriv':
+        ensure => running,
+        enable => true
     }
 }

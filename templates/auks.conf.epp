@@ -12,6 +12,11 @@ common {
     SecondaryHost = "<%= $secondary_server['name'] %>";
     SecondaryPort = "<%= $secondary_server['port'] %>";
     SecondaryPrincipal = "<%= $secondary_server['principal'] %>";
+<%- } else { -%>
+
+    SecondaryHost = "<%= $primary_server['name'] %>";
+    SecondaryPort = "<%= $primary_server['port'] %>";
+    SecondaryPrincipal = "<%= $primary_server['principal'] %>";
 <%- } -%>
 
 <% $common.each |$key, $value| { -%>

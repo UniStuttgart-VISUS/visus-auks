@@ -1,4 +1,13 @@
-# @api private
+# @summary Builds the RPM files to install AUKS.
+#
+# @param src_dir The directory where the source has been placed into. The
+#                resulting RPM files will be placed in this directory, too.
+# @param patch_slurm_dependency If true, the build process will patch the spec
+#                               file created by the configure step to exclude
+#                               the Slurm runtime and build dependencies in the
+#                               RPM. This is required if Slurm has been built
+#                               from source instead of installing it from a
+#                               package repository.
 #
 # @author Christoph Müller
 define auks::build(
