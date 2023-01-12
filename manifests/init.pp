@@ -38,7 +38,7 @@ class auks(
     } else {
         ''
     }
-    notify { "Auks hosts from principal name are \"${primary_server_host}\" and \"${secondary_server_host}\".":}
+    #notify { "Auks hosts from principal name are \"${primary_server_host}\" and \"${secondary_server_host}\".":}
     $primary_server_name = $primary_server['name']
     $secondary_server_name = if ($secondary_server) {
         $secondary_server['name']
@@ -55,6 +55,12 @@ class auks(
         or ($secondary_server_host == $trusted['hostname'])
         or ($primary_server_host == $trusted['certname'])
         or ($secondary_server_host == $trusted['certname'])
+
+    $server_state = if ($is_server) {
+        'running'
+    } else {
+        'stopped'
+    }
 
     # In case we do not have Slurm from a repo, make sure that RPM does not
     # perform the dependency check when installing.
@@ -102,6 +108,22 @@ class auks(
         install_options => $slurm_opts
     }
 
+    # Enable and start the services.
+    ~> service { 'auksd':
+        ensure => $server_state,
+        enable => $is_server
+    }
+
+    ~> service { 'auksdrenewer':
+        ensure => $server_state,
+        enable => $is_server
+    }
+
+    ~> service { 'aukspriv':
+        ensure => running,
+        enable => true
+    }
+
     # Apply the configuration.
     file { $config_file:
         ensure => file,
@@ -115,7 +137,8 @@ class auks(
             api => $api,
             auksd => $auksd,
             renewer => $renewer
-        })
+        }),
+        notify => [ Service['auksd'], Service['auksdrenewer'], Service['aukspriv'] ]
     }
 
     # Configure the built-in access rules, which make the AUKS servers
@@ -146,28 +169,7 @@ class auks(
         content => epp('auks/auks.acl.epp', {
             builtin_rules => $builtin_rules,
             rules => $rules
-        })
-    }
-
-    # Enable and start the services.
-    $server_state = if ($is_server) {
-        'running'
-    } else {
-        'stopped'
-    }
-
-    service { 'auksd':
-        ensure => $server_state,
-        enable => $is_server
-    }
-
-    ~> service { 'auksdrenewer':
-        ensure => $server_state,
-        enable => $is_server
-    }
-
-    ~> service { 'aukspriv':
-        ensure => running,
-        enable => true
+        }),
+        notify => Service['auksd']
     }
 }
