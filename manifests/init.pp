@@ -4,13 +4,30 @@
 #                     the AUKS RPMs.
 # @param repository_url The URL of the Git repository to get the sources from.
 # @param repository_revision The revision to retrieve from Git.
-# @param primary_server The FQDN of the primary AUKS server.
+# @param primary_server The configuration of the primary AUKS server. The
+#                       name, port and principal properties need to be provided
+#                       for this server.
+# @param common The attributes to be configured in the common section of the
+#               auks.conf configuration file.
+# @param api The attributes to be configured in the api section of the
+#            auks.conf configuration file.
+# @param auksd The attributes to be configured in the auksd section of the
+#              auks.conf configuration file.
+# @param renewer The attributes to be configured in the renewer section of the
+#                auks.conf configuration file.
+# @param rules The user-defined access rules. Each of the rules must specify
+#              the principal, the host and the role.
+# @param secondary_server The configuration of an optional secondary AUKS
+#                         server. If specified, the same properties as for
+#                         the primary server must be specified.
 # @param patch_slurm_dependency Patch out the dependency on Slurm packages from
 #                               the RPM. This is required if Slurm has been
 #                               built from source on the target machine. This
 #                               parameter defaults to false.
 # @param source_directory The directory where the sources of AUKS should be
 #                         stored. This parameter defaults to '/usr/local/src'.
+# @param config_file The path to the AUKS configuration file. This parameter
+#                    defaults to '/etc/auks/auks.conf'.
 #
 # @author Christoph Müller
 class auks(
@@ -56,6 +73,7 @@ class auks(
         or ($primary_server_host == $trusted['certname'])
         or ($secondary_server_host == $trusted['certname'])
 
+    # auksd and auksdrenewer are not started on client nodes, so remember this.
     $server_state = if ($is_server) {
         'running'
     } else {
@@ -81,13 +99,6 @@ class auks(
         source => $repository_url,
         revision => $repository_revision
     }
-
-#    # Determine where we actually get AUKS from.
-#    $source_url = if $source_override {
-#        $source_override
-#    } else {
-#        "https://github.com/cea-hpc/auks/archive/refs/tags/v${version}.tar.gz"
-#    }
 
     # Build the RPMs.
     ~> auks::build { 'auks-build':
