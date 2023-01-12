@@ -55,32 +55,4 @@ define auks::build(
         cwd => $src_dir,
         refreshonly => true
     }
-
-  # ~> exec { 'ldconfig-slurm':
-  #   path        => '/usr/bin:/bin:/usr/sbin:/sbin',
-  #   command     => 'ldconfig',
-  #   refreshonly => true,
-  # }
-
-  # if $slurm::slurmd {
-  #   systemd::unit_file { 'slurmd.service':ll
-  #     source  => "file:///${src_dir}/etc/slurmd.service",
-  #     require => Exec['install-slurm'],
-  #     notify  => Service['slurmd'],
-  #   }
-  # }
-  # if $slurm::slurmctld {
-  #   systemd::unit_file { 'slurmctld.service':
-  #     source  => "file:///${src_dir}/etc/slurmctld.service",
-  #     require => Exec['install-slurm'],
-  #     notify  => Service['slurmctld'],
-  #   }
-  # }
-  # if $slurm::slurmdbd {
-  #   systemd::unit_file { 'slurmdbd.service':
-  #     source  => "file:///${src_dir}/etc/slurmdbd.service",
-  #     require => Exec['install-slurm'],
-  #     notify  => Service['slurmdbd'],
-  #   }
-  # }
 }
