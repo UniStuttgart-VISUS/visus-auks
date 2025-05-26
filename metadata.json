@@ -1,6 +1,6 @@
 {
   "name": "visus-auks",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Christoph Müller",
   "summary": "Installs and configures the AUKS daemon.",
   "license": "MIT",
