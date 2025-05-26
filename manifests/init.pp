@@ -88,6 +88,27 @@ class auks(
         []
     }
 
+    # Configure the built-in access rules, which make the AUKS servers
+    # automatically admin. The client nodes must be specified by the user
+    # in the configuration file.
+    $primary_rule = {
+        # Hack from https://tickets.puppetlabs.com/browse/PUP-9554
+        principal => "^${String(Regexp($primary_server['principal'], true))}$",
+        host => '*',
+        role => 'admin'
+    }
+    $builtin_rules = if $secondary_server {
+        $secondary_rule = {
+            principal => "^${String(Regexp($secondary_server['principal'], true))}$",
+            host => '*',
+            role => 'admin'
+        }
+        [ $primary_rule, $secondary_rule ]
+    } else {
+        [ $primary_rule ]
+    }
+
+
     # Install dependencies we need to build AUKS.
     ensure_packages($dependencies)
 
@@ -136,6 +157,13 @@ class auks(
     }
 
     # Apply the configuration.
+    $config_dir = dirname($config_file)
+    file { $config_dir:
+        ensure => directory,
+        owner => 'root',
+        group => 'root'
+    }
+
     file { $config_file:
         ensure => file,
         owner => 'root',
@@ -149,30 +177,12 @@ class auks(
             auksd => $auksd,
             renewer => $renewer
         }),
+        require => File[$config_dir],
         notify => [ Service['auksd'], Service['auksdrenewer'], Service['aukspriv'] ]
     }
 
-    # Configure the built-in access rules, which make the AUKS servers
-    # automatically admin. The client nodes must be specified by the user
-    # in the configuration file.
-    $primary_rule = {
-        # Hack from https://tickets.puppetlabs.com/browse/PUP-9554
-        principal => "^${String(Regexp($primary_server['principal'], true))}$",
-        host => '*',
-        role => 'admin'
-    }
-    $builtin_rules = if $secondary_server {
-        $secondary_rule = {
-            principal => "^${String(Regexp($secondary_server['principal'], true))}$",
-            host => '*',
-            role => 'admin'
-        }
-        [ $primary_rule, $secondary_rule ]
-    } else {
-        [ $primary_rule ]
-    }
-
-    file { $auksd['ACLFile']:
+    $acl_file = $auksd['ACLFile']
+    file { $acl_file:
         ensure => file,
         owner => 'root',
         group => 'root',
@@ -181,6 +191,7 @@ class auks(
             builtin_rules => $builtin_rules,
             rules => $rules
         }),
+        require => File[$config_dir],
         notify => Service['auksd']
     }
 }

@@ -39,7 +39,7 @@ define auks::build(
     }
 
     # Patch away slurm dependencies if requested.
-    ~> exec { 'auskbuild-patchspec':
+    ~> exec { 'auksbuild-patchspec':
         path => "${src_dir}:/usr/bin:/bin:/usr/sbin:/sbin",
         command => $patch_cmd,
         cwd => $src_dir,
@@ -47,7 +47,7 @@ define auks::build(
     }
 
     # Build RPMs.
-    ~> exec { 'auskbuild-makerpm':
+    ~> exec { 'auksbuild-makerpm':
         path => "${src_dir}:/usr/bin:/bin:/usr/sbin:/sbin",
         # Note: this does not work w/o the cd, bc otherwise, the path to
         # .rpmbuild is broken.

@@ -10,6 +10,7 @@ auks::dependencies:
   - byacc
   - git
   - sed
+  - krb5-devel
 auks::repository_url: 'https://github.com/cea-hpc/auks/'
 auks::repository_revision: f584015a508247ad90d7aa319a50c1aa87e4cf3c
 
