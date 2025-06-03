@@ -17,6 +17,8 @@
 #                auks.conf configuration file.
 # @param rules The user-defined access rules. Each of the rules must specify
 #              the principal, the host and the role.
+# @param priv A list of environment variables that will be set for the
+#             aukspriv service in /etc/sysconfig.
 # @param secondary_server The configuration of an optional secondary AUKS
 #                         server. If specified, the same properties as for
 #                         the primary server must be specified.
@@ -28,6 +30,8 @@
 #                         stored. This parameter defaults to '/usr/local/src'.
 # @param config_file The path to the AUKS configuration file. This parameter
 #                    defaults to '/etc/auks/auks.conf'.
+# @param priv_env_file The path to the environment file of the aukspriv service.
+#                      This parameter defaults to '/etc/sysconfig/aukspriv'.
 #
 # @author Christoph Müller
 class auks(
@@ -40,10 +44,12 @@ class auks(
         Hash $auksd,
         Hash $renewer,
         Array[Hash] $rules,
+        Optional[Hash] $priv = undef,
         Optional[Hash] $secondary_server = undef,
         Boolean $patch_slurm_dependency = false,
         String $source_directory = '/usr/local/src',
-        String $config_file = '/etc/auks/auks.conf'
+        String $config_file = '/etc/auks/auks.conf',
+        String $priv_env_file = '/etc/sysconfig/aukspriv'
         ) {
 
     # Extract the host name from the principal name and the configured host name
@@ -133,6 +139,7 @@ class auks(
         provider => rpm,
         source => "${src_dir}/auks-[0-9].[0-9].[0-9]*86_64.rpm"
     }
+
     ~> package { 'auks-slurm':
         ensure => present,
         provider => rpm,
@@ -193,5 +200,18 @@ class auks(
         }),
         require => File[$config_dir],
         notify => Service['auksd']
+    }
+
+    if ($priv != undef) {
+        file { $priv_env_file:
+            ensure => file,
+            owner => 'root',
+            group => 'root',
+            mode => '644',
+            content => epp('auks/aukspriv.env.epp', {
+                variables => $priv
+            }),
+            notify => Service['aukspriv']
+         }
     }
 }

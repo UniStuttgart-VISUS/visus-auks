@@ -1,6 +1,6 @@
 {
   "name": "visus-auks",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Christoph Müller",
   "summary": "Installs and configures the AUKS daemon.",
   "license": "MIT",
@@ -13,27 +13,19 @@
   "operatingsystem_support": [
     {
       "operatingsystem": "CentOS",
-      "operatingsystemrelease": [
-        "7"
-      ]
+      "operatingsystemrelease": [ "7" ]
     },
     {
       "operatingsystem": "OracleLinux",
-      "operatingsystemrelease": [
-        "7"
-      ]
+      "operatingsystemrelease": [ "7", "8", "9" ]
     },
     {
       "operatingsystem": "RedHat",
-      "operatingsystemrelease": [
-        "7"
-      ]
+      "operatingsystemrelease": [ "7", "8", "9" ]
     },
     {
       "operatingsystem": "Scientific",
-      "operatingsystemrelease": [
-        "7"
-      ]
+      "operatingsystemrelease": [ "7" ]
     }
   ],
   "requirements": [

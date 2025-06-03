@@ -7,6 +7,7 @@ auks::dependencies:
   - libtool
   - rpm-build
   - libtirpc-devel
+  - flex
   - byacc
   - git
   - sed
